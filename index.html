@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Notes</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#16a34a">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+</head>
+<body>
+  <aside class="sidebar" id="sidebar">
+    <div class="side-head"><h2>📝 My Notes</h2><button class="icon-btn" id="closeMenu">✕</button></div>
+    <button class="menu-item" id="newNoteBtn">➕ Create New Note</button>
+    <button class="menu-item" id="themeToggle">🌙 Dark / Bright</button>
+    <button class="menu-item" id="exportBtn">📤 Export Notes</button>
+    <hr>
+    <p class="side-label">Theme Color</p>
+    <div class="color-row vibgyor-row">
+      <button class="color violet" data-theme-choice="violet" aria-label="Violet" title="Violet"></button>
+      <button class="color indigo" data-theme-choice="indigo" aria-label="Indigo" title="Indigo"></button>
+      <button class="color blue" data-theme-choice="blue" aria-label="Blue" title="Blue"></button>
+      <button class="color green" data-theme-choice="green" aria-label="Green" title="Green"></button>
+      <button class="color yellow" data-theme-choice="yellow" aria-label="Yellow" title="Yellow"></button>
+      <button class="color orange" data-theme-choice="orange" aria-label="Orange" title="Orange"></button>
+      <button class="color red" data-theme-choice="red" aria-label="Red" title="Red"></button>
+    </div>
+    <hr>
+    <p class="side-label">Playlists</p>
+    <button class="menu-item" id="createPlaylistBtn">＋ Create Playlist</button>
+    <div id="sidebarPlaylists"></div>
+    <hr>
+    <button class="menu-item hidden-menu-item" id="hiddenNotesBtn">🙈 Hidden Notes</button>
+  </aside>
+
+  <div class="overlay" id="overlay"></div>
+
+  <main>
+    <header>
+      <button class="icon-btn" id="menuBtn">☰</button>
+      <div class="brand"><img src="icon.svg" alt=""><h1>Notes</h1></div>
+      <button class="primary-btn" id="headerNewNote">＋ New</button>
+    </header>
+
+    <section class="search-section">
+      <input id="searchInput" type="search" placeholder="🔎 Search notes by title, tags or text...">
+    </section>
+
+    <section>
+      <div class="section-title"><h2>My Playlists</h2><button class="small-btn" id="createPlaylistBtn2">＋ Create</button></div>
+      <div class="playlist-scroll-wrap">
+        <div id="playlists" class="playlist-list"></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-title">
+        <h2>Notes</h2>
+        <div class="notes-tools"><span id="noteCount"></span></div>
+      </div>
+      <div id="notesList" class="notes-list"></div>
+    </section>
+  </main>
+
+  <div class="modal" id="noteModal" role="dialog">
+    <div class="modal-box note-editor">
+      <div class="modal-top"><h2 id="editorHeading">Create Note</h2><button class="icon-btn" data-close="noteModal">✕</button></div>
+      <div class="editor-actions">
+        <button id="favoriteBtn">☆ Favorite</button>
+        <button id="pinBtn">📌 Pin</button>
+        <div class="dropdown">
+          <button id="playlistMenuBtn">＋ Add to Playlist ▾</button>
+          <div id="playlistDropdown" class="dropdown-content"></div>
+        </div>
+      </div>
+      <input id="noteTitle" class="editor-title" placeholder="Note title...">
+      <input id="noteTags" class="editor-tags" placeholder="Tags (example: study, important)">
+      <textarea id="noteContent" placeholder="Write your note here..."></textarea>
+      <div class="editor-bottom">
+        <span id="saveStatus"></span>
+        <div class="button-row">
+          <button class="secondary-btn" data-close="noteModal">Cancel</button>
+          <button class="primary-btn" id="saveNoteBtn">Save Note</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="playlistModal" role="dialog">
+    <div class="modal-box small-modal">
+      <div class="modal-top"><h2>Create Playlist</h2><button class="icon-btn" data-close="playlistModal">✕</button></div>
+      <input id="playlistName" placeholder="Playlist name...">
+      <div id="playlistNoteSelector" class="note-selector"></div>
+      <div class="button-row">
+        <button class="secondary-btn" data-close="playlistModal">Cancel</button>
+        <button class="primary-btn full" id="savePlaylistBtn">Create Playlist</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="hiddenNotesModal" role="dialog">
+    <div class="modal-box">
+      <div class="modal-top">
+        <h2>🙈 Hidden Notes</h2>
+        <button class="icon-btn" data-close="hiddenNotesModal">✕</button>
+      </div>
+      <p class="hidden-help">Hidden notes are not shown in your normal Notes section or search results.</p>
+      <div id="hiddenNotesList" class="notes-list"></div>
+      <div class="button-row end">
+        <button class="secondary-btn" data-close="hiddenNotesModal">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="longPressMenu" role="dialog">
+    <div class="modal-box small-modal action-menu-box">
+      <div class="modal-top">
+        <h2>Note Options</h2>
+        <button class="icon-btn" data-close="longPressMenu">✕</button>
+      </div>
+      <div class="action-menu">
+        <button data-note-action="edit">✏️ Edit</button>
+        <button data-note-action="export">📤 Export</button>
+        <button data-note-action="hide">🙈 Hide</button>
+        <button data-note-action="pin">📌 Pin / Unpin</button>
+      </div>
+      <div class="button-row end">
+        <button class="secondary-btn" data-close="longPressMenu">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="playlistViewModal" role="dialog">
+    <div class="modal-box">
+      <div class="modal-top"><h2 id="playlistViewTitle"></h2><button class="icon-btn" data-close="playlistViewModal">✕</button></div>
+      <div id="playlistViewNotes" class="notes-list"></div>
+      <div class="button-row end"><button class="secondary-btn" data-close="playlistViewModal">Close</button></div>
+    </div>
+  </div>
+
+
+  <div class="item-options-menu" id="itemOptionsMenu" aria-hidden="true">
+    <button data-item-action="edit">✏️ <span>Edit</span></button>
+    <button data-item-action="delete" class="danger">🗑️ <span>Delete</span></button>
+  </div>
+
+  <div class="modal" id="confirmDeleteModal" role="dialog" aria-modal="true">
+    <div class="modal-box small-modal confirm-delete-box">
+      <div class="confirm-icon">⚠️</div>
+      <h2 id="confirmDeleteTitle">Delete?</h2>
+      <p id="confirmDeleteText">Are you sure you want to delete this? This action cannot be undone.</p>
+      <div class="button-row">
+        <button class="secondary-btn" id="cancelDeleteBtn">Cancel</button>
+        <button class="danger-btn" id="confirmDeleteBtn">Yes, Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
