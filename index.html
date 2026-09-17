@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>TaskStar</title>
+<meta name="theme-color" content="#0b1220" />
+<link rel="manifest" href="./manifest.json" />
+<link rel="icon" href="./icon-192.png" />
+<link rel="apple-touch-icon" href="./icon-192.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header class="app-header">
+      <div class="brand-row">
+        <div class="brand">Task<span>Star</span></div>
+        <div class="star-total">★ <span id="starTotal">0</span></div>
+      </div>
+
+      <div class="today-card">
+        <div class="row-top">
+          <span class="label">Today</span>
+          <span class="count" id="todayCount">0 / 0 done</span>
+        </div>
+        <div class="bar-track"><div class="bar-fill" id="todayBarFill" style="width:0%"></div></div>
+        <div class="week-strip" id="weekStrip"></div>
+      </div>
+
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="active">Active</button>
+        <button class="tab-btn" data-tab="completed">Completed</button>
+        <button class="tab-btn" data-tab="achievements">Achievements</button>
+      </div>
+    </header>
+
+    <main id="listContainer"></main>
+
+    <div class="footer-links">
+      <button id="exportBtn">Export backup</button>
+      <button onclick="document.getElementById('importInput').click()">Import backup</button>
+      <input type="file" id="importInput" accept="application/json" hidden />
+    </div>
+  </div>
+
+  <button class="fab" id="fab" aria-label="Add task">+</button>
+
+  <div class="sheet-backdrop" id="sheetBackdrop">
+    <div class="sheet">
+      <h3>New task</h3>
+
+      <div class="field">
+        <label for="taskText">What do you want to do?</label>
+        <input type="text" id="taskText" placeholder="e.g. Finish DBMS assignment" />
+      </div>
+
+      <div class="field">
+        <label for="deadlineInput">Deadline (optional)</label>
+        <input type="datetime-local" id="deadlineInput" />
+      </div>
+
+      <div class="field">
+        <label for="reminderInput">Remind me at (optional)</label>
+        <input type="datetime-local" id="reminderInput" />
+      </div>
+
+      <div class="field">
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-label">Mark as special</div>
+            <div class="toggle-sub">Extra stars + achievement effect when done</div>
+          </div>
+          <button class="switch" id="specialSwitch" data-on="0"><span class="knob"></span></button>
+        </div>
+      </div>
+
+      <div class="sheet-actions">
+        <button class="btn ghost" id="cancelBtn">Cancel</button>
+        <button class="btn primary" id="saveTaskBtn">Add task</button>
+      </div>
+    </div>
+  </div>
+
+  <canvas id="confetti-canvas"></canvas>
+  <div class="achieve-toast" id="achieveToast"></div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
