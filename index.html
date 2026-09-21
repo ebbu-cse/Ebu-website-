@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>TaskStar</title>
+<meta name="theme-color" content="#000000" />
+<link rel="manifest" href="./manifest.json" />
+<link rel="icon" href="./icon-192.png" />
+<link rel="apple-touch-icon" href="./icon-192.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+
+  <header class="topbar">
+    <button class="icon-round" id="menuBtn" aria-label="Menu">☰</button>
+    <div class="search-wrap"><input id="searchInput" placeholder="Search tasks, notes, lists..." /></div>
+    <button class="icon-round" id="themeBtn" aria-label="Toggle theme">🌙</button>
+  </header>
+
+  <div class="menu-overlay" id="menuOverlay">
+    <nav class="menu-panel">
+      <div class="menu-title">Task<span style="color:var(--gold)">Star</span></div>
+
+      <button class="menu-btn" data-action="lists"><span class="ic">📋</span> Lists</button>
+      <button class="menu-btn" data-action="notes"><span class="ic">📝</span> Notes</button>
+      <button class="menu-btn" data-action="settings"><span class="ic">⚙️</span> Settings</button>
+      <button class="menu-btn" data-action="newtask"><span class="ic">➕</span> Create new task</button>
+      <button class="menu-btn" data-action="export"><span class="ic">⬆️</span> Export</button>
+      <button class="menu-btn" data-action="import"><span class="ic">⬇️</span> Import</button>
+      <button class="menu-btn" data-action="trash"><span class="ic">🗑️</span> Trash bin</button>
+
+      <div class="menu-divider"></div>
+      <div class="menu-section-label">Theme colour</div>
+      <div class="accent-row">
+        <button class="accent-dot" data-accent="violet" style="background:#7c6cf6;color:#7c6cf6"></button>
+        <button class="accent-dot" data-accent="red" style="background:#f2716d;color:#f2716d"></button>
+        <button class="accent-dot" data-accent="blue" style="background:#5b9df9;color:#5b9df9"></button>
+        <button class="accent-dot" data-accent="purple" style="background:#b06cf6;color:#b06cf6"></button>
+      </div>
+    </nav>
+  </div>
+
+  <main class="wrap">
+
+    <!-- DAILY TASKS VIEW -->
+    <section class="view active" id="view-daily">
+      <div class="view-header"><h1>Daily tasks</h1></div>
+      <div id="dailyListContainer"></div>
+    </section>
+
+    <!-- TASKS VIEW -->
+    <section class="view" id="view-tasks">
+      <div class="glass-card streak-card">
+        <div class="streak-top">
+          <div class="streak-block">
+            <div class="streak-num"><span id="streakNum">0</span><span class="streak-flame">🔥</span></div>
+            <div class="streak-label">day streak</div>
+          </div>
+          <div class="streak-divider"></div>
+          <div class="streak-block">
+            <div class="streak-num" id="streakPct">0%</div>
+            <div class="streak-label">completion rate</div>
+          </div>
+        </div>
+        <div class="streak-avgs">
+          <div class="streak-avg-item"><span id="monthAvg">0</span> <small>tasks/day this month</small></div>
+          <div class="streak-avg-item"><span id="yearAvg">0</span> <small>tasks/day this year</small></div>
+        </div>
+      </div>
+
+      <div class="glass-card today-card">
+        <div class="row-top">
+          <span class="label">Today</span>
+          <span class="count" id="todayCount">0 / 0 done</span>
+        </div>
+        <div class="bar-track"><div class="bar-fill" id="todayBarFill" style="width:0%"></div></div>
+        <div class="week-strip" id="weekStrip"></div>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; margin-top:12px;">
+        <div class="star-total">★ <span id="starTotal">0</span></div>
+      </div>
+
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="active">Active</button>
+        <button class="tab-btn" data-tab="completed">Completed</button>
+        <button class="tab-btn" data-tab="achievements">Achievements</button>
+      </div>
+
+      <button class="mini-add-btn" id="addMiniBtn">⚡ Quick mini task</button>
+
+      <div id="listContainer"></div>
+    </section>
+
+    <!-- LISTS / PLAYLISTS VIEW -->
+    <section class="view" id="view-lists">
+      <div class="view-header"><h1>Lists</h1></div>
+      <div class="card-list" id="listsContainer"></div>
+    </section>
+
+    <!-- NOTES VIEW -->
+    <section class="view" id="view-notes">
+      <div class="view-header"><h1>Notes</h1></div>
+      <div class="card-list" id="notesContainer"></div>
+    </section>
+
+    <!-- TRASH VIEW -->
+    <section class="view" id="view-trash">
+      <div class="view-header"><h1>Trash bin</h1></div>
+      <div id="trashContainer"></div>
+    </section>
+
+    <!-- NEW / EDIT TASK — full page, not a popup -->
+    <section class="view" id="view-newtask">
+      <div class="view-header">
+        <button class="icon-round" id="taskPageBackBtn" aria-label="Back">←</button>
+        <h1 id="taskPageHeading">New task</h1>
+        <span style="width:40px"></span>
+      </div>
+
+      <div class="field">
+        <label for="taskTitle">Title</label>
+        <input type="text" id="taskTitle" placeholder="e.g. Finish DBMS assignment" />
+      </div>
+      <div class="field">
+        <label for="taskTags">Tags (comma separated)</label>
+        <input type="text" id="taskTags" placeholder="e.g. college, urgent" />
+      </div>
+      <div class="field">
+        <label for="taskBody">Tasks</label>
+        <div class="desc-toolbar" id="descToolbar">
+          <button class="icon-round" id="taskPageMiniBtn" aria-label="Add mini quick task">⚡</button>
+          <span class="desc-toolbar-label">Add mini quick task</span>
+        </div>
+        <div class="subtask-list" id="subtaskList"></div>
+      </div>
+
+      <div class="menu-divider"></div>
+      <div class="menu-section-label" style="padding-left:0;">More options</div>
+
+      <div class="field">
+        <label for="deadlineInput">Deadline (optional)</label>
+        <input type="datetime-local" id="deadlineInput" />
+      </div>
+      <div class="field">
+        <label for="reminderInput">Remind me at (optional)</label>
+        <input type="datetime-local" id="reminderInput" />
+      </div>
+      <div class="field">
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-label">Mark as special</div>
+            <div class="toggle-sub">Extra stars + achievement effect when done</div>
+          </div>
+          <button class="switch" id="specialSwitch" data-on="0"><span class="knob"></span></button>
+        </div>
+      </div>
+      <div class="field">
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-label">Repeat daily</div>
+            <div class="toggle-sub">Resets to active automatically every midnight</div>
+          </div>
+          <button class="switch" id="dailySwitch" data-on="0"><span class="knob"></span></button>
+        </div>
+      </div>
+
+      <div class="sheet-actions" style="margin-top:24px;">
+        <button class="btn ghost" id="cancelBtn">Cancel</button>
+        <button class="btn primary" id="saveTaskBtn">Add task</button>
+      </div>
+    </section>
+
+    <!-- TIMER VIEW -->
+    <section class="view" id="view-timer">
+      <div class="view-header"><h1>Timer</h1></div>
+      <div class="timer-toggle">
+        <button class="active" data-mode="stopwatch">Stopwatch</button>
+        <button data-mode="timer">Timer</button>
+      </div>
+      <div id="timerSetRow" class="timer-set" style="display:none">
+        <input type="number" id="timerMin" placeholder="min" min="0" />
+        <input type="number" id="timerSec" placeholder="sec" min="0" max="59" />
+      </div>
+      <div class="timer-display" id="timerDisplay">00:00.0</div>
+      <div class="timer-controls">
+        <button id="timerResetBtn">↺</button>
+        <button class="primary" id="timerStartBtn">▶</button>
+        <button id="timerLapBtn">🚩</button>
+      </div>
+      <div class="laps" id="lapsContainer"></div>
+    </section>
+
+    <!-- CALCULATOR VIEW -->
+    <section class="view" id="view-calculator">
+      <div class="view-header"><h1>Calculator</h1></div>
+      <div class="glass-card">
+        <div class="calc-sub" id="calcSub">&nbsp;</div>
+        <div class="calc-display" id="calcDisplay">0</div>
+        <div class="calc-grid">
+          <button class="calc-btn op" data-k="C">C</button>
+          <button class="calc-btn op" data-k="(">(</button>
+          <button class="calc-btn op" data-k=")">)</button>
+          <button class="calc-btn op" data-k="/">÷</button>
+          <button class="calc-btn" data-k="7">7</button>
+          <button class="calc-btn" data-k="8">8</button>
+          <button class="calc-btn" data-k="9">9</button>
+          <button class="calc-btn op" data-k="*">×</button>
+          <button class="calc-btn" data-k="4">4</button>
+          <button class="calc-btn" data-k="5">5</button>
+          <button class="calc-btn" data-k="6">6</button>
+          <button class="calc-btn op" data-k="-">−</button>
+          <button class="calc-btn" data-k="1">1</button>
+          <button class="calc-btn" data-k="2">2</button>
+          <button class="calc-btn" data-k="3">3</button>
+          <button class="calc-btn op" data-k="+">+</button>
+          <button class="calc-btn wide" data-k="0">0</button>
+          <button class="calc-btn" data-k=".">.</button>
+          <button class="calc-btn eq" data-k="=">=</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SETTINGS VIEW -->
+    <section class="view" id="view-settings">
+      <div class="view-header"><h1>Settings</h1></div>
+
+      <div class="glass-card settings-group" style="padding:6px 14px;">
+        <div class="settings-row">
+          <div><div>Dark mode</div><div class="sub">Pure black, easy on the eyes</div></div>
+          <button class="switch" id="settingsThemeSwitch" data-on="1"><span class="knob"></span></button>
+        </div>
+        <div class="settings-row">
+          <div><div>Notifications</div><div class="sub">Reminders for upcoming tasks</div></div>
+          <button class="btn ghost" style="flex:none;padding:8px 14px;" id="notifPermBtn">Enable</button>
+        </div>
+      </div>
+
+      <div class="glass-card settings-group" style="padding:6px 14px;">
+        <div class="settings-row"><div>Export backup</div><button class="btn ghost" style="flex:none;padding:8px 14px;" id="settingsExportBtn">Export</button></div>
+        <div class="settings-row"><div>Import backup</div><button class="btn ghost" style="flex:none;padding:8px 14px;" id="settingsImportBtn">Import</button></div>
+        <div class="settings-row"><div style="color:var(--red)">Clear all data</div><button class="btn danger" style="flex:none;padding:8px 14px;" id="clearDataBtn">Clear</button></div>
+      </div>
+
+      <div class="glass-card settings-group" style="padding:6px 14px;">
+        <div class="settings-row"><div>TaskStar</div><span class="sub">v1.0 · offline PWA</span></div>
+      </div>
+    </section>
+
+  </main>
+
+  <button class="fab" id="fab">+</button>
+
+  <nav class="bottom-nav">
+    <button class="nav-btn" data-view="daily"><span class="nic">🔁</span>Daily</button>
+    <button class="nav-btn" data-view="tasks"><span class="nic">✅</span>Tasks</button>
+    <button class="nav-btn" data-view="timer"><span class="nic">⏱</span>Timer</button>
+    <button class="nav-btn" data-view="calculator"><span class="nic">🧮</span>Calc</button>
+  </nav>
+
+  <!-- Daily sub-nav — only shown while on the Daily page -->
+  <nav class="daily-subnav" id="dailySubnav">
+    <button class="subnav-btn" id="dailyCreateBtn"><span class="nic">➕</span>Create a task</button>
+    <button class="subnav-btn" id="dailySettingsBtn"><span class="nic">⚙️</span>Settings</button>
+    <button class="subnav-btn" id="dailyRemindBtn"><span class="nic">🔔</span>Remind</button>
+  </nav>
+
+  <!-- Mini task quick-add (small popup — just the text) -->
+  <div class="sheet-backdrop modal-center" id="miniBackdrop">
+    <div class="sheet modal-sheet" style="max-width:340px;">
+      <h3 id="miniSheetTitle">Mini task</h3>
+      <div class="field">
+        <label for="miniInput">Just write the task</label>
+        <input type="text" id="miniInput" placeholder="e.g. Water the plants" />
+      </div>
+      <div class="sheet-actions">
+        <button class="btn ghost" id="miniCancelBtn">Cancel</button>
+        <button class="btn primary" id="miniSaveBtn">Add</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Daily task: per-task reset time settings -->
+  <div class="confirm-backdrop" id="dailySettingsBackdrop">
+    <div class="confirm-box info-box" style="max-width:360px;">
+      <h4>Daily reset times</h4>
+      <p style="font-size:12px;color:var(--text-muted);margin:-4px 0 12px;">Each task resets to active at its own time. Default is 12:00 AM.</p>
+      <div id="dailySettingsBody" class="info-body"></div>
+      <div class="confirm-actions"><button class="btn primary" id="dailySettingsCloseBtn">Done</button></div>
+    </div>
+  </div>
+
+  <!-- Daily task: per-task recurring reminder -->
+  <div class="confirm-backdrop" id="dailyRemindBackdrop">
+    <div class="confirm-box info-box" style="max-width:360px;">
+      <h4>Daily reminders</h4>
+      <p style="font-size:12px;color:var(--text-muted);margin:-4px 0 12px;">Set a time to be reminded about a task every day. Leave blank for none.</p>
+      <div id="dailyRemindBody" class="info-body"></div>
+      <div class="confirm-actions"><button class="btn primary" id="dailyRemindCloseBtn">Done</button></div>
+    </div>
+  </div>
+
+  <!-- Note/List sheet -->
+  <div class="sheet-backdrop" id="noteSheetBackdrop">
+    <div class="sheet">
+      <h3 id="noteSheetTitle">New note</h3>
+      <div class="field">
+        <label for="noteTitle">Title</label>
+        <input type="text" id="noteTitle" placeholder="Title" />
+      </div>
+      <div class="field">
+        <label for="noteTags">Tags (comma separated)</label>
+        <input type="text" id="noteTags" placeholder="e.g. college, urgent" />
+      </div>
+      <div class="field">
+        <label for="noteBody">Notes</label>
+        <textarea id="noteBody" placeholder="Write here..."></textarea>
+      </div>
+      <div class="sheet-actions">
+        <button class="btn ghost" id="noteCancelBtn">Cancel</button>
+        <button class="btn primary" id="noteSaveBtn">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm modal -->
+  <div class="confirm-backdrop" id="confirmBackdrop">
+    <div class="confirm-box">
+      <h4 id="confirmTitle">Delete this?</h4>
+      <p id="confirmMsg">You can restore it from the trash bin later.</p>
+      <div class="confirm-actions">
+        <button class="btn ghost" id="confirmCancelBtn">Cancel</button>
+        <button class="btn danger" id="confirmOkBtn">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Info modal -->
+  <div class="confirm-backdrop" id="infoBackdrop">
+    <div class="confirm-box info-box">
+      <h4 id="infoTitle">Task info</h4>
+      <div id="infoBody" class="info-body"></div>
+      <div class="confirm-actions">
+        <button class="btn primary" id="infoCloseBtn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="global-dropdown" id="globalDropdown"></div>
+
+  <input type="file" id="importInput" accept="application/json" hidden />
+
+  <canvas id="confetti-canvas"></canvas>
+  <div class="achieve-toast" id="achieveToast"></div>
+  <div class="toast" id="toast"></div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
